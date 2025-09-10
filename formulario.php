@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,15 +9,14 @@
     <!-- Formulario HTML -->
     <form action="formulario.php" method="post">
         <label for="nombre">Nombre:</label>
-        <input type="text" id="nombre" name="nombre" required><br>
-        <label for="apellido">apellido</label>
-        <input type="text" id="apellido" name="apellido" required><br>
-        <input type="sublimit" value="Enviar">
-
+        <input type="text" id="nombre" name="nombre" required><br><br>
+        <label for="apellido">Apellido:</label>
+        <input type="text" id="apellido" name="apellido" required><br><br>
+        <input type="submit" value="Enviar"><br><br>
     </form>
 
     <?php
-    // procesamiento del formulario PHP - servidor
+    // Procesamiento del formulario PHP - Servidor
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $nombre = $_POST["nombre"];
         $apellido = $_POST["apellido"];
