@@ -9,14 +9,12 @@
 <?php
 session_start();
 
-/**
- * Conexión a la base de datos
- */
+// Conexión a la base de datos
 function conectarBD() {
     $host = "localhost";
     $dbuser = "root";
     $dbpass = "";
-    $dbname = "usuario_php"; // cambia por la BD que usas para productos
+    $dbname = "usuario_php";
     $conn = new mysqli($host, $dbuser, $dbpass, $dbname);
     if ($conn->connect_error) {
         die("<h6 style='color:red;'>Error al conectar a la base de datos: " . $conn->connect_error . "</h6>");
@@ -24,9 +22,7 @@ function conectarBD() {
     return $conn;
 }
 
-/**
- * Consulta productos registrados
- */
+// Consulta productos
 function consultarBD() {
     $conn = conectarBD();
     $sql = "SELECT id, nombre, descripcion, precio, cantidad, imagen, created_at, updated_at FROM productos";
@@ -39,9 +35,7 @@ function consultarBD() {
 
 $result = consultarBD();
 
-/**
- * Cargar datos de producto a editar
- */
+// Cargar producto a editar
 $editar_producto = null;
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['editar_id'])) {
     $conn = conectarBD();
@@ -53,22 +47,100 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['editar_id'])) {
     $editar_producto = $stmt->get_result()->fetch_assoc();
     $stmt->close();
 }
+
+// Procesar registro, actualización o eliminación
+$conn = conectarBD();
+
+// Registrar producto
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['registrar'])) {
+    $nombre = $_POST["nombre"];
+    $descripcion = $_POST["descripcion"];
+    $precio = $_POST["precio"];
+    $cantidad = $_POST["cantidad"];
+
+    $imagen = null;
+    if (!empty($_FILES['imagen']['name'])) {
+        $imagen = basename($_FILES['imagen']['name']);
+        move_uploaded_file($_FILES['imagen']['tmp_name'], "uploads/" . $imagen);
+    }
+
+    $sql = "INSERT INTO productos (nombre, descripcion, precio, cantidad, imagen) VALUES (?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ssdis", $nombre, $descripcion, $precio, $cantidad, $imagen);
+    if ($stmt->execute()) {
+        echo "<h3 style='color:green;'>Producto registrado correctamente.</h3>";
+    } else {
+        echo "<h3 style='color:red;'>Error al registrar producto: " . $conn->error . "</h3>";
+    }
+    $stmt->close();
+    $result = consultarBD();
+}
+
+// Actualizar producto
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['actualizar']) && isset($_POST['id'])) {
+    $id = intval($_POST['id']);
+    $nombre = $_POST["nombre"];
+    $descripcion = $_POST["descripcion"];
+    $precio = $_POST["precio"];
+    $cantidad = $_POST["cantidad"];
+
+    $imagen = null;
+    if (!empty($_FILES['imagen']['name'])) {
+        $imagen = basename($_FILES['imagen']['name']);
+        move_uploaded_file($_FILES['imagen']['tmp_name'], "uploads/" . $imagen);
+    }
+
+    if ($imagen) {
+        $sql = "UPDATE productos SET nombre=?, descripcion=?, precio=?, cantidad=?, imagen=? WHERE id=?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ssdisi", $nombre, $descripcion, $precio, $cantidad, $imagen, $id);
+    } else {
+        $sql = "UPDATE productos SET nombre=?, descripcion=?, precio=?, cantidad=? WHERE id=?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ssdii", $nombre, $descripcion, $precio, $cantidad, $id);
+    }
+
+    if ($stmt->execute()) {
+        echo "<h3 style='color:green;'>Producto actualizado correctamente.</h3>";
+    } else {
+        echo "<h3 style='color:red;'>Error al actualizar producto: " . $conn->error . "</h3>";
+    }
+    $stmt->close();
+    $result = consultarBD();
+}
+
+// Eliminar producto
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['eliminar_id'])) {
+    $id = intval($_POST['eliminar_id']);
+    $sql = "DELETE FROM productos WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $id);
+    if ($stmt->execute()) {
+        echo "<h3 style='color:red;'>Producto eliminado correctamente.</h3>";
+    } else {
+        echo "<h3 style='color:red;'>Error al eliminar producto: " . $conn->error . "</h3>";
+    }
+    $stmt->close();
+}
+$result = consultarBD();
 ?>
 
-<!-- Formulario de registro/edición -->
+<!-- Formulario -->
 <div class="form-container">
     <h2 class="form-title"><?php echo $editar_producto ? "Editar Producto" : "Formulario de Productos"; ?></h2>
     <form action="productos.php" method="post" enctype="multipart/form-data">
+
         <div style="text-align: right; margin: 10px 5%;">
             <?php
             echo "User Id: " . $_SESSION['user_id'];
             $nombreSession = session_name();
             $idSession = session_id();
-            echo " |  Session Name: " . $nombreSession . "  |   Session Id: " . $idSession . "  |";
+            echo " | Session Name: " . $nombreSession . " | Session Id: " . $idSession . " |";
             ?>
             Bienvenido, <?php echo htmlspecialchars($_SESSION['username']); ?> | 
             <a href="login.php?logout">Cerrar sesión</a>
         </div>
+
         <?php if ($editar_producto): ?>
             <input type="hidden" name="id" value="<?php echo $editar_producto['id']; ?>">
         <?php endif; ?>
@@ -100,14 +172,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['editar_id'])) {
         <div class="form-group">
             <label for="imagen">Imagen</label>
             <input type="file" name="imagen">
-            <p>Imagen actual: 
-                <?php 
-                $imagenMostrar = ($editar_producto && $editar_producto['imagen']) 
-                                 ? "uploads/" . $editar_producto['imagen'] 
-                                 : "/ADSO30/img/pexels-valeriiamiller-19147427.jpg";
-                ?>
-                <img src="<?php echo $imagenMostrar; ?>" width="50" alt="Imagen del producto">
-            </p>
         </div>
 
         <div class="form-actions">
@@ -118,91 +182,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['editar_id'])) {
                 <a href="productos.php" class="cancel-btn">Cancelar</a>
             <?php endif; ?>
         </div>
+
+        <!-- Imagen de vista previa: solo ABAJO del botón -->
+        <div id="preview" style="margin-top:15px; text-align:center;">
+            <?php
+            if (isset($imagen)) {
+                echo '<img src="uploads/' . $imagen . '" width="150" alt="Imagen del producto">';
+            } elseif ($editar_producto && $editar_producto['imagen']) {
+                echo '<img src="uploads/' . $editar_producto['imagen'] . '" width="150" alt="Imagen del producto">';
+            }
+            ?>
+        </div>
+
     </form>
 </div>
-
-<?php
-$conn = conectarBD();
-
-/**
- * Registrar producto
- */
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['registrar'])) {
-    $nombre = $_POST["nombre"];
-    $descripcion = $_POST["descripcion"];
-    $precio = $_POST["precio"];
-    $cantidad = $_POST["cantidad"];
-
-    $imagen = null;
-    if (!empty($_FILES['imagen']['name'])) {
-        $imagen = basename($_FILES['imagen']['name']);
-        move_uploaded_file($_FILES['imagen']['tmp_name'], "uploads/" . $imagen);
-    }
-
-    $sql = "INSERT INTO productos (nombre, descripcion, precio, cantidad, imagen) VALUES (?, ?, ?, ?, ?)";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssdis", $nombre, $descripcion, $precio, $cantidad, $imagen);
-    if ($stmt->execute()) {
-        echo "<h3 style='color:green;'>Producto registrado correctamente.</h3>";
-    } else {
-        echo "Error al registrar producto: " . $conn->error;
-    }
-    $stmt->close();
-    $result = consultarBD();
-}
-
-/**
- * Actualizar producto
- */
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['actualizar']) && isset($_POST['id'])) {
-    $id = intval($_POST['id']);
-    $nombre = $_POST["nombre"];
-    $descripcion = $_POST["descripcion"];
-    $precio = $_POST["precio"];
-    $cantidad = $_POST["cantidad"];
-
-    $imagen = null;
-    if (!empty($_FILES['imagen']['name'])) {
-        $imagen = basename($_FILES['imagen']['name']);
-        move_uploaded_file($_FILES['imagen']['tmp_name'], "uploads/" . $imagen);
-    }
-
-    if ($imagen) {
-        $sql = "UPDATE productos SET nombre=?, descripcion=?, precio=?, cantidad=?, imagen=? WHERE id=?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssdisi", $nombre, $descripcion, $precio, $cantidad, $imagen, $id);
-    } else {
-        $sql = "UPDATE productos SET nombre=?, descripcion=?, precio=?, cantidad=? WHERE id=?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssdii", $nombre, $descripcion, $precio, $cantidad, $id);
-    }
-
-    if ($stmt->execute()) {
-        echo "<h3 style='color:green;'>Producto actualizado correctamente.</h3>";
-    } else {
-        echo "Error al actualizar producto: " . $conn->error;
-    }
-    $stmt->close();
-    $result = consultarBD();
-}
-
-/**
- * Eliminar producto
- */
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['eliminar_id'])) {
-    $id = intval($_POST['eliminar_id']);
-    $sql = "DELETE FROM productos WHERE id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $id);
-    if ($stmt->execute()) {
-        echo "<h3 style='color:red;'>Producto eliminado correctamente.</h3>";
-    } else {
-        echo "<h3 style='color:red;'>Error al eliminar producto: " . $conn->error . "</h3>";
-    }
-    $stmt->close();
-}
-$result = consultarBD();
-?>
 
 <!-- Tabla de productos -->
 <table border="1" cellpadding="5" cellspacing="0" style="margin-top:30px; width:100%;">
@@ -254,5 +247,6 @@ $result = consultarBD();
         <?php endif; ?>
     </tbody>
 </table>
+
 </body>
 </html>
