@@ -1,152 +1,126 @@
-/* styles.css */
-
-/* Estilos generales */
+/* === Estilo general === */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.6;
-    color: #333;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #f5f5f5;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg-color);
+  color: var(--text-color);
+  margin: 0;
+  padding: 0;
+  transition: all 0.3s ease;
 }
 
-h2 {
-    color: #2c3e50;
-    border-bottom: 2px solid #3498db;
-    padding-bottom: 10px;
-    margin-top: 30px;
+/* Variables de colores para modo claro/oscuro */
+:root {
+  --bg-color: #f4f4f9;
+  --text-color: #222;
+  --card-bg: #fff;
+  --table-header: #007BFF;
+  --btn-primary: #007BFF;
+  --btn-danger: #dc3545;
 }
 
-/* Estilos para el formulario */
-form {
-    background: #fff;
-    /*padding: 20px;*/
-    padding: 30px 30px 20px 30px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    margin-bottom: 30px;
+body.dark-mode {
+  --bg-color: #121212;
+  --text-color: #e0e0e0;
+  --card-bg: #1e1e1e;
+  --table-header: #4cafef;
+  --btn-primary: #4cafef;
+  --btn-danger: #ff6b6b;
 }
 
-label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 600;
-    color: #2c3e50;
+/* === Contenedor principal === */
+.container {
+  max-width: 1100px;
+  margin: 20px auto;
+  padding: 20px;
 }
 
-input[type="text"],
-input[type="password"] {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box;
-    font-size: 16px;
+/* === Caja del formulario === */
+.card {
+  background: var(--card-bg);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+  text-align: center;
 }
 
-input[type="submit"] {
-    background-color: #3498db;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s;
+/* Inputs y botones */
+input[type="text"], input[type="number"], textarea {
+  width: 90%;
+  max-width: 400px;
+  padding: 10px;
+  margin: 10px auto;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  display: block;
 }
 
-input[type="submit"]:hover {
-    background-color: #2980b9;
+button, input[type="submit"] {
+  background: var(--btn-primary);
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  margin: 5px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.3s ease;
 }
 
-a {
-    color: #3498db;
-    text-decoration: none;
-    margin-left: 15px;
-    padding: 10px 15px;
-    display: inline-block;
+button:hover, input[type="submit"]:hover {
+  transform: scale(1.05);
+  background: #0056b3;
 }
 
-a:hover {
-    text-decoration: underline;
+.btn-danger {
+  background: var(--btn-danger);
 }
 
-/* Estilos para la tabla */
+.btn-danger:hover {
+  background: #b52b35;
+}
+
+/* === Tabla === */
 table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 30px;
-    background: #fff;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-thead {
-    background-color: #3498db;
-    color: white;
-}
-
-th, td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  background: var(--card-bg);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
 }
 
 th {
-    font-weight: 600;
+  background: var(--table-header);
+  color: white;
+  padding: 12px;
 }
 
-tbody tr:hover {
-    background-color: #f1f9ff;
+td {
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
 }
 
-/* Estilos para los botones de acción */
-td form {
-    margin: 0;
-    padding: 0;
-    display: inline;
+/* Animaciones suaves */
+.card, table {
+  animation: fadeIn 0.6s ease;
 }
 
-td input[type="submit"] {
-    padding: 5px 10px;
-    font-size: 14px;
-    margin-right: 5px;
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-td form:first-child input[type="submit"] {
-    background-color: #e74c3c;
-}
-
-td form:first-child input[type="submit"]:hover {
-    background-color: #c0392b;
-}
-
-td form:last-child input[type="submit"] {
-    background-color: #2ecc71;
-}
-
-td form:last-child input[type="submit"]:hover {
-    background-color: #27ae60;
-}
-
-/* Mensajes de feedback */
-h3 {
-    padding: 10px 15px;
-    border-radius: 4px;
-    margin: 20px 0;
-}
-
-h3[style*="color:green"] {
-    background-color: #d4edda;
-    color: #155724 !important;
-    border: 1px solid #c3e6cb;
-}
-
-h3[style*="color:red"] {
-    background-color: #f8d7da;
-    color: #721c24 !important;
-    border: 1px solid #f5c6cb;
+/* Botón de modo oscuro */
+.theme-toggle {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  padding: 10px 15px;
+  border-radius: 50px;
+  border: none;
+  background: var(--btn-primary);
+  color: #fff;
+  cursor: pointer;
 }

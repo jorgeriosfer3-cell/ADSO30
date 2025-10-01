@@ -125,128 +125,143 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['eliminar_id'])) {
 $result = consultarBD();
 ?>
 
-<!-- Formulario -->
-<div class="form-container">
-    <h2 class="form-title"><?php echo $editar_producto ? "Editar Producto" : "Formulario de Productos"; ?></h2>
-    <form action="productos.php" method="post" enctype="multipart/form-data">
+<div class="container">
 
-        <div style="text-align: right; margin: 10px 5%;">
-            <?php
-            echo "User Id: " . $_SESSION['user_id'];
-            $nombreSession = session_name();
-            $idSession = session_id();
-            echo " | Session Name: " . $nombreSession . " | Session Id: " . $idSession . " |";
-            ?>
-            Bienvenido, <?php echo htmlspecialchars($_SESSION['username']); ?> | 
-            <a href="login.php?logout">Cerrar sesión</a>
-        </div>
+    <!-- Botón modo oscuro -->
+    <button class="theme-toggle" onclick="toggleTheme()">🌙/☀️</button>
 
-        <?php if ($editar_producto): ?>
-            <input type="hidden" name="id" value="<?php echo $editar_producto['id']; ?>">
-        <?php endif; ?>
+    <!-- Formulario -->
+    <div class="card">
+        <h2 class="form-title"><?php echo $editar_producto ? "Editar Producto" : "Formulario de Productos"; ?></h2>
+        <form action="productos.php" method="post" enctype="multipart/form-data">
 
-        <div class="form-group">
-            <label for="nombre">Nombre</label>
-            <input type="text" name="nombre" placeholder="Nombre del producto" 
-                value="<?php echo $editar_producto ? htmlspecialchars($editar_producto['nombre']) : ''; ?>">
-        </div>
+            <div style="text-align: right; margin: 10px 5%;">
+                <?php
+                echo "User Id: " . $_SESSION['user_id'];
+                $nombreSession = session_name();
+                $idSession = session_id();
+                echo " | Session Name: " . $nombreSession . " | Session Id: " . $idSession . " |";
+                ?>
+                Bienvenido, <?php echo htmlspecialchars($_SESSION['username']); ?> | 
+                <a href="login.php?logout">Cerrar sesión</a>
+            </div>
 
-        <div class="form-group">
-            <label for="descripcion">Descripción</label>
-            <input type="text" name="descripcion" placeholder="Descripción" 
-                value="<?php echo $editar_producto ? htmlspecialchars($editar_producto['descripcion']) : ''; ?>">
-        </div>
-
-        <div class="form-group">
-            <label for="precio">Precio</label>
-            <input type="number" step="0.01" name="precio" placeholder="Precio" 
-                value="<?php echo $editar_producto ? $editar_producto['precio'] : ''; ?>">
-        </div>
-
-        <div class="form-group">
-            <label for="cantidad">Cantidad</label>
-            <input type="number" name="cantidad" placeholder="Cantidad" 
-                value="<?php echo $editar_producto ? $editar_producto['cantidad'] : ''; ?>">
-        </div>
-
-        <div class="form-group">
-            <label for="imagen">Imagen</label>
-            <input type="file" name="imagen">
-        </div>
-
-        <div class="form-actions">
-            <input type="submit" class="btn btn-primary" 
-                name="<?php echo $editar_producto ? 'actualizar' : 'registrar'; ?>" 
-                value="<?php echo $editar_producto ? 'Actualizar' : 'Registrar'; ?>">
             <?php if ($editar_producto): ?>
-                <a href="productos.php" class="cancel-btn">Cancelar</a>
+                <input type="hidden" name="id" value="<?php echo $editar_producto['id']; ?>">
             <?php endif; ?>
-        </div>
 
-        <!-- Imagen de vista previa: solo ABAJO del botón -->
-        <div id="preview" style="margin-top:15px; text-align:center;">
-            <?php
-            if (isset($imagen)) {
-                echo '<img src="uploads/' . $imagen . '" width="150" alt="Imagen del producto">';
-            } elseif ($editar_producto && $editar_producto['imagen']) {
-                echo '<img src="uploads/' . $editar_producto['imagen'] . '" width="150" alt="Imagen del producto">';
-            }
-            ?>
-        </div>
+            <div class="form-group">
+                <label for="nombre">Nombre</label>
+                <input type="text" name="nombre" placeholder="Nombre del producto" 
+                    value="<?php echo $editar_producto ? htmlspecialchars($editar_producto['nombre']) : ''; ?>">
+            </div>
 
-    </form>
+            <div class="form-group">
+                <label for="descripcion">Descripción</label>
+                <input type="text" name="descripcion" placeholder="Descripción" 
+                    value="<?php echo $editar_producto ? htmlspecialchars($editar_producto['descripcion']) : ''; ?>">
+            </div>
+
+            <div class="form-group">
+                <label for="precio">Precio</label>
+                <input type="number" step="0.01" name="precio" placeholder="Precio" 
+                    value="<?php echo $editar_producto ? $editar_producto['precio'] : ''; ?>">
+            </div>
+
+            <div class="form-group">
+                <label for="cantidad">Cantidad</label>
+                <input type="number" name="cantidad" placeholder="Cantidad" 
+                    value="<?php echo $editar_producto ? $editar_producto['cantidad'] : ''; ?>">
+            </div>
+
+            <div class="form-group">
+                <label for="imagen">Imagen</label>
+                <input type="file" name="imagen">
+            </div>
+
+            <div class="form-actions">
+                <input type="submit" class="btn btn-primary" 
+                    name="<?php echo $editar_producto ? 'actualizar' : 'registrar'; ?>" 
+                    value="<?php echo $editar_producto ? 'Actualizar' : 'Registrar'; ?>">
+                <?php if ($editar_producto): ?>
+                    <a href="productos.php" class="cancel-btn">Cancelar</a>
+                <?php endif; ?>
+            </div>
+
+            <!-- Imagen de vista previa -->
+            <div id="preview" style="margin-top:15px; text-align:center;">
+                <?php
+                if (isset($imagen)) {
+                    echo '<img src="uploads/' . $imagen . '" width="150" alt="Imagen del producto">';
+                } elseif ($editar_producto && $editar_producto['imagen']) {
+                    echo '<img src="uploads/' . $editar_producto['imagen'] . '" width="150" alt="Imagen del producto">';
+                }
+                ?>
+            </div>
+
+        </form>
+    </div>
+
+    <!-- Tabla de productos -->
+    <div class="card" style="margin-top:20px;">
+        <table class="tabla-productos">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Imagen</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                    <th>Creado</th>
+                    <th>Actualizado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if ($result && $result->num_rows > 0): ?>
+                    <?php while($row = $result->fetch_assoc()): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($row['id']); ?></td>
+                            <td>
+                                <?php 
+                                $imgTabla = $row['imagen'] ? "uploads/" . htmlspecialchars($row['imagen']) 
+                                                            : "/ADSO30/img/pexels-valeriiamiller-19147427.jpg";
+                                ?>
+                                <img src="<?php echo $imgTabla; ?>" width="50" alt="Imagen del producto">
+                            </td>
+                            <td><?php echo htmlspecialchars($row['nombre']); ?></td>
+                            <td><?php echo htmlspecialchars($row['descripcion']); ?></td>
+                            <td><?php echo htmlspecialchars($row['precio']); ?></td>
+                            <td><?php echo htmlspecialchars($row['cantidad']); ?></td>
+                            <td><?php echo htmlspecialchars($row['created_at']); ?></td>
+                            <td><?php echo htmlspecialchars($row['updated_at']); ?></td>
+                            <td>
+                                <form method="post" style="display:inline;" onsubmit="return confirm('¿Eliminar este producto?');">
+                                    <input type="hidden" name="eliminar_id" value="<?php echo $row['id']; ?>">
+                                    <input type="submit" value="Eliminar" class="btn btn-danger">
+                                </form>
+                                <form method="post" style="display:inline;">
+                                    <input type="hidden" name="editar_id" value="<?php echo $row['id']; ?>">
+                                    <input type="submit" value="Editar" class="btn btn-warning">
+                                </form>
+                            </td>
+                        </tr>
+                    <?php endwhile; ?>     
+                <?php else: ?>
+                    <tr><td colspan="9" style="text-align:center;">No hay productos registrados</td></tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+
 </div>
 
-<!-- Tabla de productos -->
-<table border="1" cellpadding="5" cellspacing="0" style="margin-top:30px; width:100%;">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Imagen</th>
-            <th>Nombre</th>
-            <th>Descripción</th>
-            <th>Precio</th>
-            <th>Cantidad</th>
-            <th>Creado</th>
-            <th>Actualizado</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php if ($result && $result->num_rows > 0): ?>
-            <?php while($row = $result->fetch_assoc()): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($row['id']); ?></td>
-                    <td>
-                        <?php 
-                        $imgTabla = $row['imagen'] ? "uploads/" . htmlspecialchars($row['imagen']) 
-                                                    : "/ADSO30/img/pexels-valeriiamiller-19147427.jpg";
-                        ?>
-                        <img src="<?php echo $imgTabla; ?>" width="50" alt="Imagen del producto">
-                    </td>
-                    <td><?php echo htmlspecialchars($row['nombre']); ?></td>
-                    <td><?php echo htmlspecialchars($row['descripcion']); ?></td>
-                    <td><?php echo htmlspecialchars($row['precio']); ?></td>
-                    <td><?php echo htmlspecialchars($row['cantidad']); ?></td>
-                    <td><?php echo htmlspecialchars($row['created_at']); ?></td>
-                    <td><?php echo htmlspecialchars($row['updated_at']); ?></td>
-                    <td>
-                        <form method="post" style="display:inline;" onsubmit="return confirm('¿Eliminar este producto?');">
-                            <input type="hidden" name="eliminar_id" value="<?php echo $row['id']; ?>">
-                            <input type="submit" value="Eliminar">
-                        </form>
-                        <form method="post" style="display:inline;">
-                            <input type="hidden" name="editar_id" value="<?php echo $row['id']; ?>">
-                            <input type="submit" value="Editar">
-                        </form>
-                    </td>
-                </tr>
-            <?php endwhile; ?>     
-        <?php else: ?>
-            <tr><td colspan="9" style="text-align:center;">No hay productos registrados</td></tr>
-        <?php endif; ?>
-    </tbody>
-</table>
+<script>
+function toggleTheme() {
+  document.body.classList.toggle("dark-mode");
+}
+</script>
 
 </body>
 </html>
