@@ -1,12 +1,8 @@
 <?php
+session_start();
 
 /**
- * Funcion para iniciar la sesión y manejar el login de usuarios.
- */
-session_start();
-/**
- * Establece la conexión con la base de datos MySQL.
- * @return conn Objeto de conexión a la base de datos.
+ * Conexión a la base de datos
  */
 function conectarBD() {
     $host = "localhost";
@@ -21,10 +17,8 @@ function conectarBD() {
     return $conn;
 }
 
-// Procesar el formulario de login
-
 /**
- * Verifica las credenciales de inicio de sesión de un usuario.
+ * Procesar login
  */
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
     $username = trim($_POST['username']);
@@ -43,14 +37,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
         if ($result->num_rows == 1) {
             $user = $result->fetch_assoc();
             
-            // Verificar contraseña (en tu caso parece que se almacena en texto plano)
-            // En un sistema real deberías usar password_verify() con contraseñas hasheadas
+            // Comparación (sin hash en tu BD actual)
             if ($password === $user['password']) {
+                // Crear sesión PHP
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['loggedin'] = true;
-                
-                // Redirigir al panel de administración
+
+                // 🔹 Generar token de 64 caracteres (sesion_id)
+                $sesion_id = bin2hex(random_bytes(32));
+                $_SESSION['sesion_id'] = $sesion_id;
+
+                // 🔹 Registrar inicio de sesión en log_sistema
+                $sqlLog = "INSERT INTO log_sistema (sesion_id, usuario, inicio_sesion) VALUES (?, ?, NOW())";
+                $stmtLog = $conn->prepare($sqlLog);
+                $stmtLog->bind_param("ss", $sesion_id, $user['username']);
+                $stmtLog->execute();
+                $stmtLog->close();
+
+                // Redirigir al panel
                 header("Location: conexionBD_leer_registrar_eliminar_editar_css_sesion.php");
                 exit;
             } else {
@@ -64,10 +69,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
     }
 }
 
-// Cerrar sesión
+/**
+ * Procesar logout
+ */
 if (isset($_GET['logout'])) {
-    session_unset(); // elimina variables de sesión
-    session_destroy();   // destruye el fichero de sesión
+    if (isset($_SESSION['sesion_id'])) {
+        $conn = conectarBD();
+        $sqlCerrar = "UPDATE log_sistema SET cierre_sesion = NOW() WHERE sesion_id = ?";
+        $stmtCerrar = $conn->prepare($sqlCerrar);
+        $stmtCerrar->bind_param("s", $_SESSION['sesion_id']);
+        $stmtCerrar->execute();
+        $stmtCerrar->close();
+        $conn->close();
+    }
+
+    session_unset();
+    session_destroy();
     header("Location: login.php");
     exit();
 }
