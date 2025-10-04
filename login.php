@@ -1,4 +1,5 @@
 <?php
+ob_start(); // Inicia el buffer de salida
 session_start();
 
 /**
@@ -40,9 +41,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
             // Comparación (sin hash en tu BD actual)
             if ($password === $user['password']) {
                 // Crear sesión PHP
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['username'] = $user['username'];
-                $_SESSION['loggedin'] = true;
+                $_SESSION['user_id']   = $user['id'];
+                $_SESSION['username']  = $user['username'];
+                $_SESSION['loggedin']  = true;
 
                 // 🔹 Generar token de 64 caracteres (sesion_id)
                 $sesion_id = bin2hex(random_bytes(32));
@@ -55,8 +56,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
                 $stmtLog->execute();
                 $stmtLog->close();
 
-                // Redirigir al panel
-                header("Location: conexionBD_leer_registrar_eliminar_editar_css_sesion.php");
+                // ✅ Redirigir directamente al CRUD de productos
+                header("Location: productos.php");
                 exit;
             } else {
                 $error = "Contraseña incorrecta";
