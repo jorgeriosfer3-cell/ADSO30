@@ -44,15 +44,19 @@ body.dark-mode {
   text-align: center;
 }
 
-/* Inputs y botones */
-input[type="text"], input[type="number"], textarea {
-  width: 90%;
+/* Inputs y botones generales */
+input[type="text"], 
+input[type="number"], 
+input[type="password"], 
+textarea {
+  width: 100%;       /* 🔥 Fuerzo todos iguales */
   max-width: 400px;
   padding: 10px;
   margin: 10px auto;
   border: 1px solid #ccc;
   border-radius: 6px;
   display: block;
+  box-sizing: border-box;
 }
 
 button, input[type="submit"] {
@@ -123,4 +127,67 @@ td {
   background: var(--btn-primary);
   color: #fff;
   cursor: pointer;
+}
+
+/* === Ajustes SOLO para el formulario de usuarios === */
+.form-container {
+  max-width: 400px;
+  margin: 40px auto;   /* centrado horizontal */
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background: #f9f9f9;
+}
+
+.form-title {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 22px;
+  color: #333;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-group input {
+  padding: 10px;
+  border: 1px solid #aaa;
+  border-radius: 5px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Botones centrados */
+.form-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.form-actions input,
+.form-actions .cancel-btn {
+  padding: 10px 18px;
+  border-radius: 5px;
+  border: none;
+  background: #007bff;
+  color: white;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.form-actions .cancel-btn {
+  background: #dc3545;
+}
+
+.form-actions input:hover,
+.form-actions .cancel-btn:hover {
+  opacity: 0.85;
 }
